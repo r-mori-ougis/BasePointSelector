@@ -1,0 +1,14 @@
+﻿import { APP, $, fmt, nowIso, parseNumber, uuid } from './utils.js';
+export class CandidateController {
+  constructor(ui, gps, transform, photo) { this.ui = ui; this.gps = gps; this.transform = transform; this.photo = photo; this.viewer = null; this.list = []; this.photoData = null; this.currentId = null; }
+  attachViewer(viewer) { this.viewer = viewer; }
+  nextNo() { const max = this.list.reduce((acc, c) => { const n = Number(String(c.no).replace(APP.candidatePrefix, '')); return Number.isFinite(n) ? Math.max(acc, n) : acc; }, 0); return `${APP.candidatePrefix}${String(max + 1).padStart(APP.candidateDigits, '0')}`; }
+  openRegister() { if (!this.gps.last) { this.ui.toast('GPSを取得してから登録してください'); return; } $('candNo').value = this.nextNo(); $('candX').value = this.gps.last.X.toFixed(3); $('candY').value = this.gps.last.Y.toFixed(3); $('candAcc').textContent = `${Math.round(this.gps.last.accuracy)}m`; $('candMemo').value = ''; $('candPhoto').value = ''; $('candPhotoPreview').hidden = true; this.photoData = null; this.ui.openDialog('dlgCandidate'); }
+  async onPhotoSelected(input) { try { const file = input.files && input.files[0]; this.photoData = await this.photo.fileToDataUrl(file); $('candPhotoPreview').src = this.photoData || ''; $('candPhotoPreview').hidden = !this.photoData; } catch (error) { this.ui.toast(error.message); } }
+  confirmRegister() { try { const candidate = { id: uuid(), no: $('candNo').value.trim() || this.nextNo(), X: parseNumber($('candX').value, 'X'), Y: parseNumber($('candY').value, 'Y'), accuracy: this.gps.last ? this.gps.last.accuracy : null, datetime: nowIso(), memo: $('candMemo').value.trim(), photo: this.photoData }; this.list.push(candidate); this.ui.closeDialog('dlgCandidate'); this.ui.toast(`${candidate.no}を登録しました`); this.viewer.requestRender(); } catch (error) { this.ui.toast(error.message); } }
+  openDetail(id) { const candidate = this.list.find((c) => c.id === id); if (!candidate) return; this.currentId = id; $('cdTitle').textContent = candidate.no; $('cdInfo').innerHTML = `X ${fmt(candidate.X)}<br>Y ${fmt(candidate.Y)}<br>GPS精度 ${fmt(candidate.accuracy, 1)}m<br>${new Date(candidate.datetime).toLocaleString('ja-JP')}`; $('cdMemo').value = candidate.memo || ''; $('cdPhoto').src = candidate.photo || ''; $('cdPhoto').hidden = !candidate.photo; this.ui.openDialog('dlgCandDetail'); }
+  saveDetail() { const candidate = this.list.find((c) => c.id === this.currentId); if (!candidate) return; candidate.memo = $('cdMemo').value.trim(); this.ui.closeDialog('dlgCandDetail'); this.ui.toast('候補点を更新しました'); }
+  deleteDetail() { const index = this.list.findIndex((c) => c.id === this.currentId); if (index < 0) return; this.list.splice(index, 1); this.ui.closeDialog('dlgCandDetail'); this.viewer.requestRender(); this.ui.toast('候補点を削除しました'); }
+  serialize() { return this.list.slice(); }
+  restore(list) { this.list = Array.isArray(list) ? list : []; }
+}

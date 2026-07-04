@@ -1,0 +1,168 @@
+/* ダイアログ共通 */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.overlay[hidden] { display: none; }
+
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  max-height: 84vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #17222f;
+  border: 1px solid #2b3a4c;
+  border-radius: 14px;
+  padding: 18px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+.dialog h2 {
+  margin: 0 0 12px;
+  font-size: 17px;
+  color: #fff;
+}
+
+.dialog h3 {
+  margin: 16px 0 8px;
+  font-size: 14px;
+  color: #9fb2c6;
+}
+
+.dialog label {
+  display: block;
+  margin: 10px 0;
+  font-size: 13px;
+  color: #9fb2c6;
+}
+
+.dialog input[type="text"],
+.dialog input[type="number"],
+.dialog select,
+.dialog textarea {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px;
+  border: 1px solid #33465c;
+  border-radius: 8px;
+  background: #0e1621;
+  color: #fff;
+  font-size: 16px; /* iOSの自動ズーム防止 */
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.dialog input[type="file"] {
+  margin-top: 6px;
+  color: #cdd8e4;
+  font-size: 13px;
+}
+
+/* ボタン */
+.btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-row button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #33465c;
+  border-radius: 8px;
+  background: #22354a;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-row button:active { background: #2f66a8; }
+.btn-row button.primary { background: #1f6fd0; border-color: #1f6fd0; }
+.btn-row button.danger { background: #8a2b2b; border-color: #8a2b2b; }
+
+/* リスト */
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #2b3a4c;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.item-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid #22303f;
+  font-size: 13px;
+}
+
+.item-list li:last-child { border-bottom: none; }
+.item-list li.empty { color: #66788c; justify-content: center; }
+
+.item-list .grow { flex: 1 1 auto; min-width: 0; }
+.item-list .sub { color: #8b98a8; font-size: 11px; display: block; }
+
+.item-list button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #22354a;
+  color: #fff;
+  font-size: 12px;
+}
+
+.item-list button.danger { background: #8a2b2b; }
+
+/* 残差・情報表示 */
+.rmse {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #ffd36e;
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  font-size: 11px;
+  color: #66788c;
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+
+.info-row {
+  font-size: 13px;
+  color: #9fb2c6;
+  margin: 8px 0;
+}
+
+.info-block {
+  font-size: 13px;
+  color: #cdd8e4;
+  line-height: 1.9;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.photo-preview {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  margin-top: 8px;
+  border-radius: 8px;
+  background: #0e1621;
+}

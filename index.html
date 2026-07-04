@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#153a66">
+  <title>基準点選点支援システム Ver.1.0</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/viewer.css">
+  <link rel="stylesheet" href="css/dialog.css">
+</head>
+<body>
+  <header id="toolbar" aria-label="ツールバー">
+    <button id="btnLoad" type="button">読込</button>
+    <button id="btnSave" type="button">保存</button>
+    <button id="btnProject" type="button">プロジェクト</button>
+    <button id="btnCalib" type="button">標定</button>
+    <button id="btnGps" type="button">GPS</button>
+    <button id="btnCandidate" type="button">候補登録</button>
+    <input type="file" id="fileInput" accept="application/pdf,image/png,image/jpeg" hidden>
+  </header>
+  <main id="viewerContainer">
+    <canvas id="viewerCanvas"></canvas>
+    <div id="viewerHint">「読込」からPDF・JPEG・PNGを開いてください</div>
+    <div id="tapBanner" hidden><span id="tapBannerMsg">図面上の位置をタップしてください</span><button id="tapCancel" type="button">中止</button></div>
+  </main>
+  <footer id="statusbar">
+    <span>倍率 <b id="stZoom">-</b></span><span>GPS精度 <b id="stAcc">-</b></span><span>X <b id="stX">-</b></span><span>Y <b id="stY">-</b></span><span>RMSE <b id="stRmse">-</b></span>
+  </footer>
+  <div id="toast" hidden role="status" aria-live="polite"></div>
+
+  <div class="overlay" id="dlgProject" hidden><div class="dialog"><h2>プロジェクト</h2><label>案件名<input type="text" id="prjName" placeholder="例：令和8年度 地籍調査"></label><label>地区名<input type="text" id="prjArea" placeholder="例：山林地区"></label><label>平面直角座標系<select id="prjZone"></select></label><div class="btn-row"><button id="prjNew" type="button">新規作成</button><button id="prjExport" type="button">JSON出力</button><button id="prjImportBtn" type="button">JSON読込</button><input type="file" id="prjImportFile" accept=".json,application/json" hidden></div><h3>保存済みプロジェクト</h3><ul id="prjList" class="item-list"><li class="empty">保存済みプロジェクトはありません</li></ul><div class="btn-row"><button class="primary" data-close type="button">閉じる</button></div></div></div>
+  <div class="overlay" id="dlgCalib" hidden><div class="dialog"><h2>標定点一覧</h2><ul id="calibList" class="item-list"><li class="empty">標定点はありません</li></ul><div id="calibRmse" class="rmse"></div><div class="btn-row"><button id="calibAdd" type="button">点を追加</button><button id="calibCompute" type="button">計算</button><button id="calibClear" class="danger" type="button">全消去</button></div><p class="note">最低2点で相似変換、3点以上でアフィン変換、4点では最小二乗法により残差とRMSEを表示します。</p><div class="btn-row"><button class="primary" data-close type="button">閉じる</button></div></div></div>
+  <div class="overlay" id="dlgCoordInput" hidden><div class="dialog"><h2>標定点の座標入力</h2><label>X（北方向・m）<input type="number" id="calibX" step="0.001" inputmode="decimal"></label><label>Y（東方向・m）<input type="number" id="calibY" step="0.001" inputmode="decimal"></label><div class="btn-row"><button class="primary" id="calibCoordOk" type="button">登録</button><button id="calibCoordCancel" data-close type="button">キャンセル</button></div></div></div>
+  <div class="overlay" id="dlgCandidate" hidden><div class="dialog"><h2>候補点登録</h2><label>番号<input type="text" id="candNo"></label><label>X（北方向・m）<input type="number" id="candX" step="0.001" inputmode="decimal"></label><label>Y（東方向・m）<input type="number" id="candY" step="0.001" inputmode="decimal"></label><div class="info-row">GPS精度：<span id="candAcc">-</span></div><label>メモ<textarea id="candMemo" rows="3" placeholder="見通し・設置条件など"></textarea></label><label class="photo-label">写真<input type="file" id="candPhoto" accept="image/*" capture="environment"></label><img id="candPhotoPreview" class="photo-preview" hidden alt="写真プレビュー"><div class="btn-row"><button class="primary" id="candOk" type="button">登録</button><button data-close type="button">キャンセル</button></div></div></div>
+  <div class="overlay" id="dlgCandDetail" hidden><div class="dialog"><h2 id="cdTitle">候補点</h2><div id="cdInfo" class="info-block"></div><img id="cdPhoto" class="photo-preview" hidden alt="候補点写真"><label>メモ<textarea id="cdMemo" rows="3"></textarea></label><div class="btn-row"><button class="primary" id="cdSave" type="button">更新</button><button class="danger" id="cdDelete" type="button">削除</button><button data-close type="button">閉じる</button></div></div></div>
+  <script src="lib/proj4.js"></script>
+  <script src="lib/pdf.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
