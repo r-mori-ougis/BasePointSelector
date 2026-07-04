@@ -6,7 +6,10 @@ export function nowIso() { return new Date().toISOString(); }
 export function uuid() { if (crypto && crypto.randomUUID) return crypto.randomUUID(); return `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
 export function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
 export function circled(index) { return ['①','②','③','④'][index - 1] || String(index); }
-export function readFileAsArrayBuffer(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(new Error('ファイル読込に失敗しました')); reader.readAsArrayBuffer(file); }); }
+export function isDevelopmentMode() { return location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.search.includes('debug=1'); }
+export function debugLog(message, details) { if (!isDevelopmentMode()) return; if (details === undefined) console.log(message); else console.log(message, details); }
+export function debugError(error, cause) { if (!isDevelopmentMode()) return; console.error('Error', error); console.error('Stack Trace', error && error.stack ? error.stack : '(no stack)'); console.error('原因', cause || (error && error.message) || '不明'); }
+export function readFileAsArrayBuffer(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => { if (!(reader.result instanceof ArrayBuffer)) { reject(new Error('ファイルをArrayBufferとして読み込めませんでした')); return; } resolve(reader.result); }; reader.onerror = () => reject(new Error('ファイル読込に失敗しました')); reader.readAsArrayBuffer(file); }); }
 export function readFileAsDataUrl(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(new Error('写真読込に失敗しました')); reader.readAsDataURL(file); }); }
 export function downloadJson(filename, data) { const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
 export function isVisible(point, width, height) { return point.x >= 0 && point.y >= 0 && point.x <= width && point.y <= height; }

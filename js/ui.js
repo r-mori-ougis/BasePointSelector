@@ -4,6 +4,7 @@ export class UIController {
   init() { document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => this.closeNearest(b))); this.populateZones(); }
   populateZones() { const select = $('prjZone'); select.innerHTML = ''; for (let zone = 1; zone <= 19; zone += 1) { const option = document.createElement('option'); option.value = String(zone); option.textContent = `${zone}系`; if (zone === 1) option.selected = true; select.appendChild(option); } }
   toast(message, duration = APP.toastMs) { const el = $('toast'); el.textContent = message; el.hidden = false; clearTimeout(this.toastTimer); this.toastTimer = window.setTimeout(() => { el.hidden = true; }, duration); }
+  showError(message) { this.toast(message, 5000); window.alert(message); }
   openDialog(id) { $(id).hidden = false; }
   closeDialog(id) { $(id).hidden = true; }
   closeNearest(element) { const overlay = element.closest('.overlay'); if (overlay) overlay.hidden = true; }

@@ -1,4 +1,4 @@
-﻿import { $, readFileAsArrayBuffer } from './utils.js';
+﻿import { $, debugError, debugLog } from './utils.js';
 import { UIController } from './ui.js';
 import { TransformService } from './transform.js';
 import { StorageService } from './storage.js';
@@ -25,7 +25,7 @@ class App {
   }
 
   async init() {
-    if (globalThis.pdfjsLib) globalThis.pdfjsLib.GlobalWorkerOptions.workerSrc = 'lib/pdf.worker.min.js';
+    this.initPdfJs();
     this.ui.init();
     this.viewer.init();
     this.bindEvents();
@@ -34,10 +34,20 @@ class App {
       await this.project.loadLast();
       await this.project.renderList();
     } catch (error) {
-      console.error(error);
+      debugError(error, 'IndexedDB初期化または前回プロジェクト復元に失敗しました');
       this.ui.toast('保存領域を開けません。プライベートブラウズでは保存できない場合があります');
     }
     this.registerServiceWorker();
+  }
+
+  initPdfJs() {
+    if (!globalThis.pdfjsLib) {
+      debugLog('PDF.js未読込');
+      return;
+    }
+    const workerUrl = new URL('../lib/pdf.worker.min.js', import.meta.url).toString();
+    globalThis.pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+    debugLog('PDF.js workerSrc', workerUrl);
   }
 
   bindEvents() {
@@ -70,12 +80,13 @@ class App {
     input.value = '';
     if (!file) return;
     try {
+      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) debugLog('PDF選択', { name: file.name, size: file.size, type: file.type });
       this.ui.toast('読み込み中...', 60000);
       await this.project.setDrawing(file);
       this.ui.toast(`${file.name}を読み込みました`);
     } catch (error) {
-      console.error(error);
-      this.ui.toast(error.message || 'ファイル読込に失敗しました');
+      debugError(error, '選択ファイルの読込に失敗しました');
+      this.ui.showError(error.message || 'ファイル読込に失敗しました');
     }
   }
 
